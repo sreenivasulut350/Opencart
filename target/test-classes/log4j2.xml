@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    
+    <!-- Define properties for reusable paths and patterns -->
+    <Properties>
+        <Property name="LOG_DIR">./logs</Property>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- 1. Console Appender: For real-time execution tracking in IDE terminal -->
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <!-- 2. Rolling File Appender: Saves logs daily and archives them when they reach 10MB -->
+        <RollingFile name="FileAppender" 
+                     fileName="${LOG_DIR}/automation.log"
+                     filePattern="${LOG_DIR}/archived/automation-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Root logger captures everything from INFO level and upwards -->
+        <Root level="debug">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="FileAppender"/>
+        </Root>
+        
+        <!-- Optional: Mute highly verbose third-party framework logs (like Apache HttpClient or Selenium Drivers) -->
+        <Logger name="org.apache.http" level="WARN"/>
+        <Logger name="org.openqa.selenium" level="WARN"/>
+    </Loggers>
+    
+</Configuration>
